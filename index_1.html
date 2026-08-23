@@ -866,6 +866,7 @@
     height: 100%;
     display: block;
     background: transparent;
+    border-radius: 18px;
   }
 
   @media (max-width: 380px){
@@ -1106,7 +1107,28 @@
           this.pause();
           this.currentTime = Math.max(0, (this.duration || 0) - 0.001);
         }catch(e){}
-      }, { once: true });
+      });
+
+      // restart from the beginning each time the section scrolls back into view
+      var dressSection = document.querySelector('.dress-section');
+      if(dressSection && 'IntersectionObserver' in window){
+        var dressIO = new IntersectionObserver(function(entries){
+          entries.forEach(function(entry){
+            if(entry.isIntersecting){
+              try{
+                video.currentTime = 0;
+                video.play();
+              }catch(e){}
+            } else {
+              try{
+                video.pause();
+                video.currentTime = 0;
+              }catch(e){}
+            }
+          });
+        }, { threshold: 0.15 });
+        dressIO.observe(dressSection);
+      }
     })();
   </script>
 </section>
