@@ -884,6 +884,33 @@
     opacity: 1;
   }
 
+  /* ---------- SOFT EDGE / FADED BOX OUTLINE ---------- */
+  /* Round the video and apply a feathered mask so the rect edge fades softly into the page */
+  .dress-video-wrap, .dress-video-wrap video{
+    border-radius: 18px;
+  }
+
+  .dress-video-wrap video{
+    -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 72%, rgba(0,0,0,0.9) 82%, rgba(0,0,0,0) 100%);
+    mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 72%, rgba(0,0,0,0.9) 82%, rgba(0,0,0,0) 100%);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  /* inner vignette removed per user request - keep pseudo element harmless */
+  .dress-video-wrap::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    pointer-events: none;
+    box-shadow: none;
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+
   @media (max-width: 380px){
     .dress-video-wrap{ max-width: 340px; }
   }
@@ -1066,6 +1093,22 @@
   </video>
   <div class="dress-video-fade" aria-hidden="true"></div>
   </div>
+  <script>
+    (function(){
+      var v = document.getElementById('dress-video');
+      if(!v) return;
+      // ensure there's no loop
+      v.removeAttribute('loop');
+      // when playback ends, pause and snap to last frame
+      v.addEventListener('ended', function(){
+        try{
+          this.pause();
+          // set to a tiny bit before duration to ensure last frame renders
+          this.currentTime = Math.max(0, (this.duration || 0) - 0.001);
+        }catch(e){}
+      }, { once: true });
+    })();
+  </script>
 </section>
 
 <section class="medallion-section reveal">
